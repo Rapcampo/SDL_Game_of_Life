@@ -9,19 +9,24 @@
 #include "string.h"
 #include "stdbool.h"
 
-#define USAGE "place"
-#define FORMAT "holder"
+#define FORMAT "Incorrect number of arguments\n"
+#define USAGE "Usage: ./life [width] [height] [map]"
 
 typedef struct s_life {
     SDL_Window  *window;
+    bool        running;
     char        *map;
+    int         cellsize;
     int         width;
+    int         cw;
     int         height;
-    char        **curGen;
-    char        **nextGen;
+    int         ch;
+    long        generations;
+    int         **curGen;
+    int         **nextGen;
 }   t_life;
 
-bool game_of_life(t_life *life);
+void game_of_life(t_life *life);
 bool draw_life(t_life *life);
 
 #endif

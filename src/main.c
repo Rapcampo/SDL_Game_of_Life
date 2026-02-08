@@ -6,10 +6,14 @@
 
 void	cleanup(t_life *life);
 
-int parse(int width, int height, const char *map, t_life *life) {
+int parse(const int width, const int height, const char *map, t_life *life) {
 
 	//FILE *map = fopen(map, "r");
 	(void)map;
+	if (width < 640  || width > 3840 || height < 480  || height > 2160)
+		return 1;
+	else if (width % 10 != 0 || height % 10 != 0)
+		return 1;
 	life->width = width;
 	life->height = height;
 	return 0;
@@ -25,19 +29,22 @@ void	gameInit(t_life *life) {
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
 		cleanup(life);
 	}
+	life->cellsize = 10;
+	life->cw = life->width / life->cellsize;
+	life->ch = life->height / life->cellsize;
 }
 
 void	mainLoop(t_life *life) {
 	const bool *keys = SDL_GetKeyboardState(nullptr);
 	bool paused = false;
-	bool done = false;
 
-	while (!done){
+	while (life->running){
 		SDL_Event event;
+		SDL_Delay(16);
 		while (SDL_PollEvent(&event)){
 			if (event.type == SDL_EVENT_QUIT
-				|| event.type == SDL_EVENT_KEY_DOWN && keys[SDL_SCANCODE_ESCAPE]){
-				done = true;
+				|| (event.type == SDL_EVENT_KEY_DOWN && keys[SDL_SCANCODE_ESCAPE])){
+				life->running = false;
 				}
 			else if (event.type == SDL_EVENT_KEY_DOWN && keys[SDL_SCANCODE_SPACE]){
 				paused = paused ? false : true;
@@ -46,7 +53,8 @@ void	mainLoop(t_life *life) {
 		}
 		if (paused)
 			continue;
-		//place life code here
+		game_of_life(life);
+		draw_life(life);
 	}
 }
 
@@ -58,14 +66,15 @@ void	cleanup(t_life *life) {
 
 int main(int argc, char **argv){
 	t_life life = {0};
+	life.running = true;
 
 	if (argc < 4) {
-		puts("Insufficient arguments provided");
+		fputs("Insufficient arguments provided", stderr);
 		puts(FORMAT USAGE);
 		return 1;
 	}
 	if (parse(atoi(argv[1]), atoi(argv[2]), argv[3], &life)) {
-		puts("Invalid Arguments provided");
+		fputs("Invalid Arguments provided", stderr);
 		return 1;
 	}
 	gameInit(&life);
