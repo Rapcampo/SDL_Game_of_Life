@@ -3,14 +3,14 @@
 NAME	= Life
 SOURCE	= $(SOURCE_DIR)
 OBJS	= $(addprefix $(OBJS_DIR), $(SOURCE_LST:.c=.o))
-SDL		= -L ./SDL/build/sdl
+#SDL		= -L ./SDL/build/sdl
 # ============================ Folder Structures ===============================
 
 HEADERS		= ./includes/
 SOURCE_DIR	= $(addprefix ./src/, main.c, graphics.c, life.c)
 OBJS_DIR	= ./objs/
 SOURCE_LST	= main.c $(ENGINE) $(MEMORY) $(UTILS) $(PARSER) $(MAP)
-SDL_DIR		= ./SDL/build/
+#SDL_DIR		= ./SDL/build/
 
 # ============================ Commands & Flags ===============================
 
@@ -21,7 +21,7 @@ FLAGS		= -Wall -Wextra -Werror -g #-O3 -pg
 LEAKS		= -g -fsanitize=address
 DEBUG		= -DDEBUG
 MAKE_FLAG	= --no-print-directory
-SDL_FLAGS	= 
+SDL_FLAGS	= -lSDL3
 
 # =========================== Ansi Escape Codes ================================
 
@@ -45,9 +45,9 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	echo "[$(CYAN)$(BLINK)Linking...$(RESET)]"
 ifdef debug
-	$(CC) $(FLAGS) $(LEAKS) $(SDL) -o $@ $^ #$(SDL_FLAGS)
+	$(CC) $(FLAGS) $(LEAKS) -o $@ $^ $(SDL_FLAGS)
 else
-	$(CC) $(FLAGS) $(SDL) -o $@ $^ #$(SDL_FLAGS)
+	$(CC) $(FLAGS) -o $@ $^ $(SDL_FLAGS)
 endif
 	echo "\n*************************$(GREEN)$(BLINK)    "\
 		"[Compilation Sucessfull!]    $(RESET)*************************\n"
@@ -63,16 +63,12 @@ endif
 	mv $(SOURCE_LST:.c=.o) $(OBJS_DIR)
 
 clean:
-	make clean $(MAKE_FLAG) -C $(LIBFT_DIR)
-	make clean $(MAKE_FLAG) -sC $(SDL_DIR)
 	$(RM) $(OBJS)
 	$(RM) $(OBJS_DIR)
 	echo "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's Objects have been" \
 		"removed sucessfully$(RESET)    +++++++++++++++\n\n"
 
 fclean: clean
-	make fclean $(MAKE_FLAG) -C $(LIBFT_DIR)
-	make clean $(MAKE_FLAG) -sC $(SDL_DIR)
 	$(RM) $(NAME)
 	$(RM) $(BONUS)
 	echo "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's libraries and "\
@@ -82,9 +78,6 @@ re: fclean all
 
 leak: all
 	valgrind --leak-check=full --show-leak-kinds=all ./$(name) \
-		maps/valid/test.cub
-bleak: bonus 
-	valgrind --leak-check=full --show-leak-kinds=all ./$(BONUS) \
 		maps/valid/test.cub
 
 run: re
