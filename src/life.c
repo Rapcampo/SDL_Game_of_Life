@@ -34,6 +34,8 @@ void game_of_life(t_life *life) {
     int neigh;
     int prev;
     life->generations++;
+    if (life->curGen == nullptr)
+        return;
     for (int y = 0; y < life->ch; y++) {
         for (int x = 0; x < life->cw; x++) {
             neigh = count_neighbours(life, x, y);

@@ -8,14 +8,14 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdbool.h"
+#include "time.h"
 
 #define FORMAT "Incorrect number of arguments\n"
-#define USAGE "Usage: ./life [width] [height] [map]"
+#define USAGE "Usage: ./life [width] [height]"
 
 typedef struct s_life {
     SDL_Window  *window;
     bool        running;
-    char        *map;
     int         cellsize;
     int         width;
     int         cw;
@@ -28,5 +28,6 @@ typedef struct s_life {
 
 void game_of_life(t_life *life);
 bool draw_life(t_life *life);
+void generate_map(t_life *life);
 
 #endif

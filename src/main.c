@@ -1,15 +1,10 @@
 #include "../includes/life.h"
 //life should have window x and y, map file to be parsed,
-//TODO: parsing function to verify initial map
 //TODO: implement screen pixel drawing
-//TODO: implement game of life logic
 
 void	cleanup(t_life *life);
 
-int parse(const int width, const int height, const char *map, t_life *life) {
-
-	//FILE *map = fopen(map, "r");
-	(void)map;
+int parse(const int width, const int height, t_life *life) {
 	if (width < 640  || width > 3840 || height < 480  || height > 2160)
 		return 1;
 	else if (width % 10 != 0 || height % 10 != 0)
@@ -29,9 +24,16 @@ void	gameInit(t_life *life) {
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
 		cleanup(life);
 	}
-	life->cellsize = 10;
-	life->cw = life->width / life->cellsize;
-	life->ch = life->height / life->cellsize;
+	generate_map(life);
+}
+
+//debug only
+void print_life(t_life *life) {
+for (int y = 0; y < life->ch; y++){
+		for (int x = 0; x < life->cw; x++)
+			putchar(life->curGen[y][x] ? '0' : ' ');
+		putchar('\n');
+	}
 }
 
 void	mainLoop(t_life *life) {
@@ -51,16 +53,30 @@ void	mainLoop(t_life *life) {
 				paused ? SDL_Log("game is paused") : SDL_Log("game is unpaused");
 			}
 		}
+
 		if (paused)
 			continue;
 		game_of_life(life);
-		draw_life(life);
+		print_life(life);
+		sleep(1);
+		printf("\x1B[2J");
+	//	draw_life(life);
 	}
 }
 
 void	cleanup(t_life *life) {
 	if (life->window)
 		SDL_DestroyWindow(life->window);
+	if (life->curGen) {
+		for (int i = 0; i < life->ch; i++)
+			free(life->curGen[i]);
+		free(life->curGen);
+	}
+	if (life->nextGen) {
+		for (int i = 0; i < life->ch; i++)
+			free(life->nextGen[i]);
+		free(life->nextGen);
+	}
 	SDL_Quit();
 }
 
@@ -68,12 +84,11 @@ int main(int argc, char **argv){
 	t_life life = {0};
 	life.running = true;
 
-	if (argc < 4) {
-		fputs("Insufficient arguments provided", stderr);
+	if (argc < 3) {
 		puts(FORMAT USAGE);
 		return 1;
 	}
-	if (parse(atoi(argv[1]), atoi(argv[2]), argv[3], &life)) {
+	if (parse(atoi(argv[1]), atoi(argv[2]), &life)) {
 		fputs("Invalid Arguments provided", stderr);
 		return 1;
 	}
