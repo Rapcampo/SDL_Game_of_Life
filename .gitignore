@@ -3,3 +3,4 @@ SDL/*
 *.o
 objs
 .idea
+.idea/*

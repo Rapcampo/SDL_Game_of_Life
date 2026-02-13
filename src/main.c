@@ -22,13 +22,12 @@ void	gameInit(t_life *life) {
 	}
 
 	SDL_DisplayID primary = SDL_GetPrimaryDisplay();
-	life->displays = SDL_GetDisplays(&life->display_num);
-	SDL_GetDisplayBounds(primary, &life->DisplayBounds);
-	float scale = SDL_GetDisplayContentScale(primary);
-	if (life->DisplayBounds.w <= life->width)
-		life->width = life->DisplayBounds.w;
-	if (life->DisplayBounds.h <= life->height)
-		life->height = life->DisplayBounds.h;
+	life->disp.displays = SDL_GetDisplays(&life->disp.display_num);
+	SDL_GetDisplayUsableBounds(primary, &life->disp.DisplayBounds);
+	if (life->disp.DisplayBounds.w <= life->width)
+		life->width = life->disp.DisplayBounds.w;
+	if (life->disp.DisplayBounds.h <= life->height)
+		life->height = life->disp.DisplayBounds.h;
 
 	life->window = SDL_CreateWindow("Game of Life",
 		life->width, life->height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
@@ -50,7 +49,6 @@ void	gameInit(t_life *life) {
 	}
 	SDL_Log("width in px: %d\n", life->width);
 	SDL_Log("height in px: %d\n", life->height);
-	SDL_Log("Number of Displays: %d", life->display_num);
 	generate_map(life);
 }
 
@@ -63,6 +61,21 @@ for (int y = 0; y < life->ch; y++){
 	}
 }
 
+void updateWindow(t_life *life) {
+	int win_x = 0, win_y = 0;
+	SDL_GetWindowSizeInPixels(life->window, &win_x, &win_y);
+	float scale_x = (float)win_x / life->width;
+	float scale_y = (float)win_y / life->height;
+	float absolute_s = (scale_x < scale_y) ? scale_x : scale_y;
+
+	if (absolute_s < 0.1f)
+		absolute_s = 0.1f;
+	SDL_SetRenderScale(life->renderer, absolute_s, absolute_s);
+	life->view.scale = absolute_s;
+	life->view.off_y = ((float)win_y / absolute_s - (float)life->height) * 0.5f;
+	life->view.off_x = ((float)win_x / absolute_s - (float)life->width) * 0.5f;
+}
+
 void	mainLoop(t_life *life) {
 	bool paused = false;
 	int decoupled_board = 0;
@@ -71,7 +84,7 @@ void	mainLoop(t_life *life) {
 		return;
 	while (life->running){
 		SDL_Event event;
-		SDL_Delay(2);
+		SDL_Delay(16);
 		while (SDL_PollEvent(&event)){
 			if (event.type == SDL_EVENT_QUIT
 				|| (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)){
@@ -81,9 +94,11 @@ void	mainLoop(t_life *life) {
 				paused = paused ? false : true;
 				paused ? SDL_Log("game is paused") : SDL_Log("game is unpaused");
 			}
+			if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
+				updateWindow(life);
 		}
 
-		if (!paused && decoupled_board >= 30) {
+		if (!paused && decoupled_board >= 7) {
 			game_of_life(life);
 			decoupled_board = 0;
 		}
@@ -107,8 +122,8 @@ void	cleanup(t_life *life) {
 				free(life->nextGen[i]);
 		free(life->nextGen);
 	}
-	if (life->displays)
-		SDL_free(life->displays);
+	if (life->disp.displays)
+		SDL_free(life->disp.displays);
 	SDL_Quit();
 }
 
@@ -121,7 +136,7 @@ int main(int argc, char **argv){
 		return 1;
 	}
 	if (parse(atoi(argv[1]), atoi(argv[2]), &life)) {
-		fputs("Invalid Arguments provided", stderr);
+		fputs("Invalid Arguments provided\n", stderr);
 		return 1;
 	}
 	gameInit(&life);

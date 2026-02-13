@@ -1,15 +1,16 @@
 # ================================= Files ======================================
 
-NAME	= Life
+NAME	= life
 SOURCE	= $(SOURCE_DIR)
+FILES	= main.c graphics.c life.c
 OBJS	= $(addprefix $(OBJS_DIR), $(SOURCE_LST:.c=.o))
-#SDL		= -L ./SDL/build/sdl
+SDL		= -L /home/linuxbrew/.linuxbrew/lib/libSDL3.so*
 # ============================ Folder Structures ===============================
 
 HEADERS		= ./includes/
-SOURCE_DIR	= $(addprefix ./src/, main.c, graphics.c, life.c)
+SOURCE_DIR	= $(addprefix ./src/, $(FILES))
 OBJS_DIR	= ./objs/
-SOURCE_LST	= main.c $(ENGINE) $(MEMORY) $(UTILS) $(PARSER) $(MAP)
+SOURCE_LST	= $(FILES)
 #SDL_DIR		= ./SDL/build/
 
 # ============================ Commands & Flags ===============================
@@ -45,9 +46,9 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	echo "[$(CYAN)$(BLINK)Linking...$(RESET)]"
 ifdef debug
-	$(CC) $(FLAGS) $(LEAKS) -o $@ $^ $(SDL_FLAGS)
+	$(CC) $(FLAGS) $(LEAKS) -o $@ $^ $(SDL) $(SDL_FLAGS)
 else
-	$(CC) $(FLAGS) -o $@ $^ $(SDL_FLAGS)
+	$(CC) $(FLAGS) -o $@ $^ $(SDL) $(SDL_FLAGS)
 endif
 	echo "\n*************************$(GREEN)$(BLINK)    "\
 		"[Compilation Sucessfull!]    $(RESET)*************************\n"
@@ -77,11 +78,10 @@ fclean: clean
 re: fclean all
 
 leak: all
-	valgrind --leak-check=full --show-leak-kinds=all ./$(name) \
-		maps/valid/test.cub
+	valgrind --leak-check=full --show-leak-kinds=definite,indirect ./life 1080 1920 
 
 run: re
-	./$(NAME) maps/valid/test.cub
+	./life 1920 1080
 
 .SILENT:
 
