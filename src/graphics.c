@@ -30,11 +30,14 @@ void    generate_map(t_life *life) {
 
     allocate_maps(life);
 
+    srand(time(NULL));
     double xfactor;
+    const double coeficients[3] = {0.13, 0.18, 0.25};
+    double seed = coeficients[(rand() % 3)];
     for (int y = 0; y < life->ch; y++) {
         for (int x = 0; x < life->cw; x++) {
             xfactor = (double)rand() / (double)RAND_MAX;
-            life->curGen[y][x] = (xfactor < 0.18) ? 1 : 0;
+            life->curGen[y][x] = (xfactor < seed) ? 1 : 0;
         }
     }
 }
