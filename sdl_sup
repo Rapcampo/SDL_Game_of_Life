@@ -1,0 +1,9 @@
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/home/linuxbrew/.linuxbrew/lib/libLLVM.so.*
+   obj:/home/linuxbrew/.linuxbrew/lib/libSDL3.so.*
+   ...
+}

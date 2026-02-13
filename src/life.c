@@ -18,7 +18,7 @@ int bound_neighbours(const t_life *life, const int x, const int y) {
 int unbound_neighbours(const t_life *life, const int x, const int y) {
     int **t = life->curGen;
     return t[y - 1][x - 1] + t[y - 1][x] + t[y - 1][x + 1]
-            +t[y][x - 1] + t[y][x] + t[y][x + 1]
+            +t[y][x - 1]  + t[y][x + 1]
             +t[y + 1][x - 1] + t[y + 1][x] + t[y + 1][x + 1];
 }
 
@@ -43,7 +43,9 @@ void game_of_life(t_life *life) {
             life->nextGen[y][x] = prev ? (neigh == 2 || neigh == 3) : (neigh == 3);
         }
     }
-    int **tmp = life->curGen;
-    *life->curGen = *life->nextGen;
-    *life->nextGen = *tmp;
+    for (int y = 0; y < life->ch; y++) {
+        for (int x = 0; x < life->cw; x++) {
+            life->curGen[y][x] = life->nextGen[y][x];
+        }
+    }
 }

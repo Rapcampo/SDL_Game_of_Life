@@ -15,6 +15,7 @@
 
 typedef struct s_life {
     SDL_Window  *window;
+    SDL_Renderer *renderer;
     bool        running;
     int         cellsize;
     int         width;
@@ -24,10 +25,15 @@ typedef struct s_life {
     long        generations;
     int         **curGen;
     int         **nextGen;
+    int         offset_x;
+    int         offset_y;
+    int         display_num;
+    SDL_Rect    DisplayBounds;
+    SDL_DisplayID *displays;
 }   t_life;
 
 void game_of_life(t_life *life);
-bool draw_life(t_life *life);
+void draw_life(t_life *life);
 void generate_map(t_life *life);
 
 #endif
