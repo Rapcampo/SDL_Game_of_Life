@@ -1,16 +1,16 @@
 #include "../includes/life.h"
 
 void    allocate_maps(t_life *life) {
-    life->curGen = calloc(life->ch * 1, sizeof(*life->curGen) + 1);
-    life->nextGen = calloc(life->ch * 1, sizeof(*life->nextGen) + 1);
-    for (int i = 0; i < life->ch; i++) {
-        life->curGen[i] = calloc(life->cw * 1 ,sizeof(**life->curGen) + 1);
-        life->nextGen[i] = calloc(life->cw * 1 ,sizeof(**life->nextGen) + 1);
+    life->curGen = calloc(life->row * 1, sizeof(*life->curGen) + 1);
+    life->nextGen = calloc(life->row * 1, sizeof(*life->nextGen) + 1);
+    for (int i = 0; i < life->row; i++) {
+        life->curGen[i] = calloc(life->cols * 1 ,sizeof(**life->curGen) + 1);
+        life->nextGen[i] = calloc(life->cols * 1 ,sizeof(**life->nextGen) + 1);
     }
 }
 
 void    generate_map(t_life *life) {
-    int bigger = life->req_width > life->req_height ? life->req_width : life->req_height;
+    int bigger = life->requestedWidth > life->requestedHeight ? life->requestedWidth : life->requestedHeight;
     int targetGrid = 120 * (bigger * 0.2);
     int cellpx = bigger / targetGrid;
     if (cellpx < 4)
@@ -18,11 +18,11 @@ void    generate_map(t_life *life) {
     if (cellpx > 20)
         cellpx = 20;
     life->cellsize = cellpx;
-    life->cw = life->req_width / life->cellsize;
-    life->ch = life->req_height / life->cellsize;
-    int grid_w = life->cw * life->cellsize;
-    int grid_h = life->ch * life->cellsize;
-    int offset_x = (life->req_width - grid_w) >> 1, offset_y = (life->req_height - grid_h) >> 1;
+    life->cols = life->requestedWidth / life->cellsize;
+    life->row = life->requestedHeight / life->cellsize;
+    int grid_w = life->cols * life->cellsize;
+    int grid_h = life->row * life->cellsize;
+    int offset_x = (life->requestedWidth - grid_w) >> 1, offset_y = (life->requestedHeight - grid_h) >> 1;
     life->view.off_x = offset_x;
     life->view.off_y = offset_y;
 
@@ -32,8 +32,8 @@ void    generate_map(t_life *life) {
     double xfactor;
     const double coeficients[3] = {0.08, 0.13, 0.15};
     double seed = coeficients[(rand() % 3)];
-    for (int y = 0; y < life->ch; y++) {
-        for (int x = 0; x < life->cw; x++) {
+    for (int y = 0; y < life->row; y++) {
+        for (int x = 0; x < life->cols; x++) {
             xfactor = (double)rand() / (double)RAND_MAX;
             life->curGen[y][x] = (xfactor < seed) ? 1 : 0;
         }
@@ -88,8 +88,8 @@ void    draw_life(t_life *life) {
     float r,g,b;
     select_shader(&r, &g, &b, life->shader);
     SDL_SetRenderDrawColorFloat(life->renderer, r, g, b, SDL_ALPHA_OPAQUE_FLOAT);
-    for (int y = 0; y < life->ch; y++) {
-        for (int x = 0; x < life->cw; x++) {
+    for (int y = 0; y < life->row; y++) {
+        for (int x = 0; x < life->cols; x++) {
             if (!life->curGen[y][x])
                 continue;
             SDL_FRect rect = {life->view.off_x + x * life->cellsize, life->view.off_y + y * life->cellsize,

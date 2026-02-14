@@ -33,8 +33,8 @@ typedef struct s_life {
     bool        running;
     int         cellsize;
     int         width, height;
-    int         req_width, req_height;
-    int         cw, ch;
+    int         requestedWidth, requestedHeight;
+    int         cols, row;
     long        generations;
     int         **curGen, **nextGen;
     int         shader;

@@ -5,8 +5,8 @@ int bound_neighbours(const t_life *life, const int x, const int y) {
     for (int yy = -1; yy <= 1; yy++) {
         for (int xx = -1; xx <= 1; xx++) {
             if ((xx || yy)
-                && yy + y < life->ch
-                && xx + x < life->cw
+                && yy + y < life->row
+                && xx + x < life->cols
                 && yy + y >= 0
                 && xx + x >= 0)
                 n += life->curGen[yy + y][xx + x];
@@ -23,8 +23,8 @@ int unbound_neighbours(const t_life *life, const int x, const int y) {
 }
 
 int count_neighbours(const t_life *life, const int x, const int y) {
-    if (x - 1 >= 0 && x + 1 < life->cw
-        && y - 1 >= 0 && y + 1 < life->ch) {
+    if (x - 1 >= 0 && x + 1 < life->cols
+        && y - 1 >= 0 && y + 1 < life->row) {
         return unbound_neighbours(life, x, y);
     }
     return bound_neighbours(life, x, y);
@@ -36,15 +36,15 @@ void game_of_life(t_life *life) {
     life->generations++;
     if (life->curGen == nullptr)
         return;
-    for (int y = 0; y < life->ch; y++) {
-        for (int x = 0; x < life->cw; x++) {
+    for (int y = 0; y < life->row; y++) {
+        for (int x = 0; x < life->cols; x++) {
             neigh = count_neighbours(life, x, y);
             prev = life->curGen[y][x];
             life->nextGen[y][x] = prev ? (neigh == 2 || neigh == 3) : (neigh == 3);
         }
     }
-    for (int y = 0; y < life->ch; y++) {
-        for (int x = 0; x < life->cw; x++) {
+    for (int y = 0; y < life->row; y++) {
+        for (int x = 0; x < life->cols; x++) {
             life->curGen[y][x] = life->nextGen[y][x];
         }
     }

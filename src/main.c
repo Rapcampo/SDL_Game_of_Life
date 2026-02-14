@@ -9,8 +9,8 @@ int parse(const int width, const int height, const int shader, t_life *life) {
 		return 1;
 	else if (width % 10 != 0 || height % 10 != 0)
 		return 1;
-	life->req_width = width;
-	life->req_height = height;
+	life->requestedWidth = width;
+	life->requestedHeight = height;
 	life->height = height;
 	life->width = width;
 	life->shader = shader;
@@ -27,9 +27,9 @@ void	gameInit(t_life *life) {
 	SDL_DisplayID primary = SDL_GetPrimaryDisplay();
 	life->disp.displays = SDL_GetDisplays(&life->disp.display_num);
 	SDL_GetDisplayUsableBounds(primary, &life->disp.DisplayBounds);
-	if (life->disp.DisplayBounds.w < life->req_width)
+	if (life->disp.DisplayBounds.w < life->requestedWidth)
 		life->width = life->disp.DisplayBounds.w;
-	if (life->disp.DisplayBounds.h < life->req_height)
+	if (life->disp.DisplayBounds.h < life->requestedHeight)
 		life->height = life->disp.DisplayBounds.h;
 
 	life->window = SDL_CreateWindow("Game of Life",
@@ -58,16 +58,16 @@ void	gameInit(t_life *life) {
 void updateWindow(t_life *life) {
 	int win_x = 0, win_y = 0;
 	SDL_GetWindowSizeInPixels(life->window, &win_x, &win_y);
-	float scale_x = (float)win_x / life->req_width;
-	float scale_y = (float)win_y / life->req_height;
+	float scale_x = (float)win_x / life->requestedWidth;
+	float scale_y = (float)win_y / life->requestedHeight;
 	float absolute_s = (scale_x < scale_y) ? scale_x : scale_y;
 
 	if (absolute_s < 0.1f)
 		absolute_s = 0.1f;
 	SDL_SetRenderScale(life->renderer, absolute_s, absolute_s);
 	life->view.scale = absolute_s;
-	life->view.off_y = ((float)win_y / absolute_s - (float)life->req_height) * 0.5f;
-	life->view.off_x = ((float)win_x / absolute_s - (float)life->req_width) * 0.5f;
+	life->view.off_y = ((float)win_y / absolute_s - (float)life->requestedHeight) * 0.5f;
+	life->view.off_x = ((float)win_x / absolute_s - (float)life->requestedWidth) * 0.5f;
 }
 
 void	mainLoop(t_life *life) {
