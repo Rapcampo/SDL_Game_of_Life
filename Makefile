@@ -18,7 +18,7 @@ SOURCE_LST	= $(FILES)
 CC			= cc
 RM			= rm -rf
 #AR			= ar -rcs
-FLAGS		= -Wall -Wextra -Werror -g #-O3 -pg
+FLAGS		= -Wall -Wextra -Werror -g -O3 #-pg
 LEAKS		= -g -fsanitize=address
 DEBUG		= -DDEBUG
 MAKE_FLAG	= --no-print-directory
