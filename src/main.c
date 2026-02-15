@@ -1,8 +1,26 @@
 #include "../includes/life.h"
-//life should have window x and y, map file to be parsed,
-//TODO: implement screen pixel drawing
 
 void	cleanup(t_life *life);
+
+void	print_gamestats(t_life *life) {
+	int actualWidth, actualHeight;
+	char **shader = (char *[]){"No shader", "Rainbow", "Purple", "Orange", NULL};
+	SDL_GetWindowSize(life->window, &actualWidth, &actualHeight);
+	SDL_Log(GRN"\tGame stats\n"CLR
+		 GRN"Name:\e[0;39m Game of Life\n"
+		 YLW"Window size:\e[0;39m %dx%d\n"
+		 CYN"Video driver:\e[0;39m %s\n"
+		 PRP"Renderer:\e[0;39m %s\n"
+		 BLU"Requested resolution:\e[0;39m %dx%d\n"
+		 BLK"Shader Option:\e[0;39m %s\n"
+		 RED"Board size:\e[0;39m %dx%d"RST
+		 , actualWidth, actualHeight
+		 , SDL_GetCurrentVideoDriver()
+		 , SDL_GetRendererName(life->renderer)
+		 , life->requestedWidth, life->requestedHeight
+		 , shader[life->shader]
+		 , life->cols, life->row);
+}
 
 int parse(const int width, const int height, const int shader, t_life *life) {
 	if (width < 640  || width > 3840 || height < 480  || height > 2160)
@@ -15,12 +33,14 @@ int parse(const int width, const int height, const int shader, t_life *life) {
 	life->width = width;
 	life->shader = shader;
 	return 0;
+
 }
 
 void	gameInit(t_life *life) {
 	SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "vulkan,opengles2,opengl");
 	if (!SDL_Init(SDL_INIT_VIDEO)) {
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize SDL: %s", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, RED"Couldn't initialize SDL: %s"RST, SDL_GetError());
 		return;
 	}
 
@@ -35,23 +55,21 @@ void	gameInit(t_life *life) {
 	life->window = SDL_CreateWindow("Game of Life",
 		life->width, life->height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
 	if (!life->window){
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, RED"Could not create window: %s\n"RST, SDL_GetError());
 		cleanup(life);
 		return;
 	}
 	if (SDL_GetWindowSizeInPixels(life->window, &life->width, &life->height) == false) {
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to get window size: %s\n", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, RED"Failed to get window size: %s\n"RST, SDL_GetError());
 		cleanup(life);
 		return;
 	}
 	life->renderer = SDL_CreateRenderer(life->window, nullptr);
 	if (!life->renderer) {
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create renderer: %s\n", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, RED"Could not create renderer: %s\n"RST, SDL_GetError());
 		cleanup(life);
 		return;
 	}
-	SDL_Log("width in px: %d\n", life->width);
-	SDL_Log("height in px: %d\n", life->height);
 	generate_map(life);
 }
 
@@ -76,6 +94,7 @@ void	mainLoop(t_life *life) {
 
 	if (!life->window || !life->renderer)
 		return;
+	print_gamestats(life);
 	while (life->running){
 		SDL_Event event;
 		SDL_Delay(16);
@@ -86,7 +105,7 @@ void	mainLoop(t_life *life) {
 				}
 			else if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_SPACE){
 				paused = paused ? false : true;
-				paused ? SDL_Log("game is paused") : SDL_Log("game is unpaused");
+				paused ? SDL_Log(YLW"game is paused"RST) : SDL_Log(GRN"game is unpaused"RST);
 			}
 			if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
 				updateWindow(life);
@@ -94,6 +113,8 @@ void	mainLoop(t_life *life) {
 
 		if (!paused && decoupled_board >= 7) {
 			game_of_life(life);
+			printf("\rCurrent Generation: \e[1;33m%zu\e[0m", life->generations);
+			fflush(stdout);
 			decoupled_board = 0;
 		}
 		decoupled_board++;
@@ -130,11 +151,11 @@ int main(int argc, char **argv){
 		return 1;
 	}
 	if (argc == 3 && parse(atoi(argv[1]), atoi(argv[2]), 1, &life)) {
-		fputs("Invalid Arguments provided\n", stderr);
+		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
 		return 1;
 	}
 	else if (argc == 4 && parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), &life)) {
-		fputs("Invalid Arguments provided\n", stderr);
+		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
 		return 1;
 	}
 

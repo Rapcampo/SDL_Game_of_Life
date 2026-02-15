@@ -4,14 +4,13 @@ NAME	= life
 SOURCE	= $(SOURCE_DIR)
 FILES	= main.c graphics.c life.c
 OBJS	= $(addprefix $(OBJS_DIR), $(SOURCE_LST:.c=.o))
-SDL		= -L /home/linuxbrew/.linuxbrew/lib/libSDL3.so*
 # ============================ Folder Structures ===============================
-
+#
 HEADERS		= ./includes/
 SOURCE_DIR	= $(addprefix ./src/, $(FILES))
 OBJS_DIR	= ./objs/
 SOURCE_LST	= $(FILES)
-#SDL_DIR		= ./SDL/build/
+LDFLAGS		= $(shell pkg-config --libs sdl3) 
 
 # ============================ Commands & Flags ===============================
 
@@ -22,7 +21,7 @@ FLAGS		= -Wall -Wextra -Werror -g -O3 #-pg
 LEAKS		= -g -fsanitize=address
 DEBUG		= -DDEBUG
 MAKE_FLAG	= --no-print-directory
-SDL_FLAGS	= -lSDL3
+SDL_FLAGS	= $(shell pkg-config --cflags sdl3)
 
 # =========================== Ansi Escape Codes ================================
 
@@ -44,35 +43,35 @@ RESET	= \e[0m
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	echo "[$(CYAN)$(BLINK)Linking...$(RESET)]"
+	echo -e "[$(CYAN)$(BLINK)Linking...$(RESET)]"
 ifdef debug
-	$(CC) $(FLAGS) $(LEAKS) -o $@ $^ $(SDL) $(SDL_FLAGS)
+	$(CC) $(FLAGS) $(LEAKS) -o $@ $^ $(LDFLAGS) $(SDL_FLAGS)
 else
-	$(CC) $(FLAGS) -o $@ $^ $(SDL) $(SDL_FLAGS)
+	$(CC) $(FLAGS) -o $@ $^ $(LDFLAGS) $(SDL_FLAGS)
 endif
-	echo "\n*************************$(GREEN)$(BLINK)    "\
+	echo -e "\n*************************$(GREEN)$(BLINK)    "\
 		"[Compilation Sucessfull!]    $(RESET)*************************\n"
 
 $(OBJS):
-	echo "[$(PURPLE)$(BLINK)Compiling...$(RESET)] $(YELLOW)sources$(RESET)"
+	echo -e "[$(PURPLE)$(BLINK)Compiling...$(RESET)] $(YELLOW)sources$(RESET)"
 	mkdir -p objs
 ifdef debug
-	$(CC) $(FLAGS) $(LEAKS) -c $(SOURCE_DIR) -I $(HEADERS) $(DEBUG)
+	$(CC) $(FLAGS) $(LEAKS) -c $(SOURCE_DIR) -I $(HEADERS) $(SDL_FLAGS) $(DEBUG)
 else
-	$(CC) $(FLAGS) -c $(SOURCE_DIR) -I $(HEADERS)
+	$(CC) $(FLAGS) -c $(SOURCE_DIR) -I $(HEADERS) $(SDL_FLAGS)
 endif
 	mv $(SOURCE_LST:.c=.o) $(OBJS_DIR)
 
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(OBJS_DIR)
-	echo "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's Objects have been" \
+	echo -e "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's Objects have been" \
 		"removed sucessfully$(RESET)    +++++++++++++++\n\n"
 
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(BONUS)
-	echo "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's libraries and "\
+	echo -e "\n\n++++++++++++++    $(ULINE)$(GREEN)Life's libraries and "\
 		"programs removed successfully$(RESET)    +++++++++++++++\n\n"
 
 re: fclean all

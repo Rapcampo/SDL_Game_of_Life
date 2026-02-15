@@ -11,9 +11,28 @@
 #include <time.h>
 #include <math.h>
 
-#define FORMAT "Incorrect number of arguments\n"
-#define USAGE "Usage: ./life [width] [height] <shader>\n"
-#define SHADERS "\nShader options:\n[0] - no shader\n[1] - Rainbow(default)\n[2] - Purple\n[3] - Orange\n\n"
+/*============================= Ansi colours =================================*/
+
+# define RST "\e[0m"
+# define ULI "\e[4m"
+# define BLN "\e[5m"
+# define BLK "\e[1;30m"
+# define RED "\e[1;31m"
+# define GRN "\e[1;32m"
+# define YLW "\e[1;33m"
+# define BLU "\e[1;34m"
+# define PRP "\e[1;35m"
+# define CYN "\e[1;36m"
+# define WHT "\e[1;37m"
+# define CLR "\e[0;39m"
+
+#define FORMAT "\e[5;1;31mIncorrect number of arguments\e[0m\n"
+#define USAGE "\e[1;33mUsage:\e[0m ./life [width] [height] <shader>\n"
+#define SHADERS "\n\t\e[1;32mShader options:\e[0;39m\n \
+[0] - no shader\n \
+[1] - \e[1;31mR\e[1;32ma\e[1;33mi\e[1;34mn\e[1;35mb\e[1;36mo\e[1;31mw\e[1;37m(default)\e[0;39m\n \
+[2] - \e[1;35mPurple\e[0;39m\n \
+[3] - \e[1;31mOrange\e[0m\n\n"
 
 typedef struct s_scale {
     float     scale;
@@ -35,7 +54,7 @@ typedef struct s_life {
     int         width, height;
     int         requestedWidth, requestedHeight;
     int         cols, row;
-    long        generations;
+    long		generations;
     int         **curGen, **nextGen;
     int         shader;
     t_scale     view;
