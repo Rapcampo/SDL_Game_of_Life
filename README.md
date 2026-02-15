@@ -2,6 +2,8 @@
 
 John Conway's Game of Life implemented in C using SDL as a graphics library.
 
+![gameoflife](./assets/life.webp)
+
 ## Contents
 
 - [Description](#description)
