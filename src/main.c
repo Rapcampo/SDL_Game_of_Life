@@ -64,7 +64,7 @@ void	gameInit(t_life *life) {
 		cleanup(life);
 		return;
 	}
-	life->renderer = SDL_CreateRenderer(life->window, nullptr);
+	life->renderer = SDL_CreateRenderer(life->window, NULL);
 	if (!life->renderer) {
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, RED"Could not create renderer: %s\n"RST, SDL_GetError());
 		cleanup(life);

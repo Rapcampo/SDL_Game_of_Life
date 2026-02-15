@@ -34,7 +34,7 @@ void game_of_life(t_life *life) {
     int neigh;
     int prev;
     life->generations++;
-    if (life->curGen == nullptr)
+    if (life->curGen == NULL)
         return;
     for (int y = 0; y < life->row; y++) {
         for (int x = 0; x < life->cols; x++) {
