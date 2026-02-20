@@ -146,7 +146,7 @@ void	cleanup(t_life *life) {
 	SDL_Quit();
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
 	t_life life = {0};
 	life.running = true;
 
@@ -162,9 +162,14 @@ int main(int argc, char **argv){
 		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
 		return 1;
 	}
-	else if ((argc == 5 && parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), strtoul(argv[4], NULL, 16), &life))){
-		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
-		return 1;
+	else if (argc == 5){
+		bool hasHashtag = false;
+		if (argv[4][0] == '#')
+			hasHashtag = true;
+		if (parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), strtoul(argv[4] + hasHashtag, NULL, 16), &life)) {
+			fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
+			return 1;
+		}
 	}
 
 	gameInit(&life);
