@@ -1,5 +1,11 @@
 #include "../includes/life.h"
 
+void    hexToFloatColor(t_color *color, ulong hexnbr) {
+    color->r = (float)((hexnbr >> 16) & 0xFF) / 255.f;
+    color->g = (float)((hexnbr >> 8) & 0xFF) / 255.f;
+    color->b = (float)(hexnbr & 0xFF) / 255.f;
+}
+
 void    allocate_maps(t_life *life) {
     life->curGen = calloc(life->row * 1, sizeof(*life->curGen) + 1);
     life->nextGen = calloc(life->row * 1, sizeof(*life->nextGen) + 1);
@@ -64,7 +70,15 @@ void   orange_shader(float *r, float *g, float *b) {
     *b = 0.075f * intensity;
 }
 
-void    select_shader(float *r, float *g, float *b, int shader) {
+void   custom_shader(float *r, float *g, float *b, t_color *color) {
+    double time = (double)SDL_GetTicks() / 400;
+    float intensity = 0.8f + 0.5f * (0.5f + 0.5f * SDL_sin(time));
+    *r = color->r * intensity;
+    *g = color->g * intensity;
+    *b = color->b * intensity;
+}
+
+void    select_shader(float *r, float *g, float *b, int shader, t_color *color) {
     switch (shader) {
         case 1:
             rainbow_shader(r, g, b);
@@ -74,6 +88,9 @@ void    select_shader(float *r, float *g, float *b, int shader) {
             break;
         case 3:
             orange_shader(r, g, b);
+            break;
+        case 4:
+            custom_shader(r, g, b, color);
             break;
         default:
             *r = 255.0f, *g = 255.0f, *b = 255.0f;
@@ -86,7 +103,7 @@ void    draw_life(t_life *life) {
     SDL_RenderClear(life->renderer);
 
     float r,g,b;
-    select_shader(&r, &g, &b, life->shader);
+    select_shader(&r, &g, &b, life->shader, &life->color);
     SDL_SetRenderDrawColorFloat(life->renderer, r, g, b, SDL_ALPHA_OPAQUE_FLOAT);
     for (int y = 0; y < life->row; y++) {
         for (int x = 0; x < life->cols; x++) {

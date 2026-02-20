@@ -4,7 +4,7 @@ void	cleanup(t_life *life);
 
 void	print_gamestats(t_life *life) {
 	int actualWidth, actualHeight;
-	char **shader = (char *[]){"No shader", "Rainbow", "Purple", "Orange", NULL};
+	char **shader = (char *[]){"No shader", "Rainbow", "Purple", "Orange", "Custom", NULL};
 	SDL_GetWindowSize(life->window, &actualWidth, &actualHeight);
 	SDL_Log(GRN"\tGame stats\n"CLR
 		 GRN"Name:\e[0;39m Game of Life\n"
@@ -22,11 +22,15 @@ void	print_gamestats(t_life *life) {
 		 , life->cols, life->row);
 }
 
-int parse(const int width, const int height, const int shader, t_life *life) {
+int parse(const int width, const int height, const int shader, const ulong hexnbr, t_life *life) {
 	if (width < 640  || width > 3840 || height < 480  || height > 2160)
 		return 1;
 	else if (width % 10 != 0 || height % 10 != 0)
 		return 1;
+	if (hexnbr > 0xffffff || (shader == 4 && hexnbr == 0))
+		return 1;
+	if (hexnbr != 0)
+		hexToFloatColor(&life->color, hexnbr);
 	life->requestedWidth = width;
 	life->requestedHeight = height;
 	life->height = height;
@@ -146,15 +150,19 @@ int main(int argc, char **argv){
 	t_life life = {0};
 	life.running = true;
 
-	if (argc < 3 || argc > 4) {
+	if (argc < 3 || argc > 5) {
 		SDL_Log(FORMAT USAGE SHADERS);
 		return 1;
 	}
-	if (argc == 3 && parse(atoi(argv[1]), atoi(argv[2]), 1, &life)) {
+	if (argc == 3 && parse(atoi(argv[1]), atoi(argv[2]), 1, 0, &life)) {
 		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
 		return 1;
 	}
-	else if (argc == 4 && parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), &life)) {
+	else if (argc == 4 && parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), 0, &life)) {
+		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
+		return 1;
+	}
+	else if ((argc == 5 && parse(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), strtoul(argv[4], NULL, 16), &life))){
 		fputs(RED BLK"Invalid Arguments provided\n"RST, stderr);
 		return 1;
 	}
