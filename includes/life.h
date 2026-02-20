@@ -33,7 +33,7 @@
 [1] - \e[1;31mR\e[1;32ma\e[1;33mi\e[1;34mn\e[1;35mb\e[1;36mo\e[1;31mw\e[1;37m(default)\e[0;39m\n \
 [2] - \e[1;35mPurple\e[0;39m\n \
 [3] - \e[1;31mOrange\e[0m\n \
-[4] - \e[1;36mCustom hex: accepted formats [0xFFFFFF][FFFFFF][ffffff]\e[0m\n\n"
+[4] - \e[1;36mCustom hex: accepted formats [0xFFFFFF][FFFFFF][ffffff][\\#ffffff]\e[0m\n\n"
 
 typedef struct s_scale {
     float     scale;

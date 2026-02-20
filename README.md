@@ -64,7 +64,7 @@ If there is an error `SDL\SDL3_main.h` include not found, make sure SDL is corre
 
 ## Usage
 
-A run of the program can have the following format `./life [width] [height] <shader> <hexcolor>` where width and height are the requested resolutions, and shader as an optional hue of choice. A custom color choice can be added by using shader number 4, with the input color in the following formats `0xFFFFFF` `FFFFFF` `ffffff`. CSS style `#ffffff` is not supported.
+A run of the program can have the following format `./life [width] [height] <shader> <hexcolor>` where width and height are the requested resolutions, and shader as an optional hue of choice. A custom color choice can be added by using shader number 4, with the input color in the following formats `0xFFFFFF` `FFFFFF` `ffffff`. CSS style `#ffffff` is also supported, however, it needs to be `\#ffffff` or `"#ffffff"` as comments in shell start with `#`.
 The resolution can be anything between 640x480 all the way up to 3840x2160, as long as the resolution is cleanly divisible by 10.
 
 It is worth noting that resolution passed as an argument is a **request** and therefore the window generated will depend on your actual usable monitor resolution as a safety measure. The board will still be generated with the requested resolution and downscalled to the window size (or upscalled in the case of increasing window size after running the program).
